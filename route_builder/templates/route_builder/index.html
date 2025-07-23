@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Логистика ЖД</title>
+    <link rel="stylesheet" href="{% static 'route_builder/css/style.css' %}">
+</head>
+<body>
+    <h1>Построение маршрута</h1>
+    
+    <div id="app">
+        <!-- Станция отправления -->
+        <div class="current-station">
+            <h2>Текущая станция: <span id="current-station">Воркута</span></h2>
+        </div>
+        
+        <!-- Соседние станции -->
+        <div id="neighbors-panel" class="neighbors">
+            <!-- Кнопки будут генерироваться через JS -->
+        </div>
+        
+        <!-- Таблица маршрута -->
+        <table id="route-table" class="route-table">
+            <thead>
+                <tr>
+                    <th>Станция</th>
+                    <th>Время хода, ч</th>
+                    <th>Километры</th>
+                    <th>Замена бригады</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Строки будут добавляться через JS -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Итого:</td>
+                    <td id="total-time">0</td>
+                    <td id="total-distance">0</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <!-- Управление -->
+        <div class="controls">
+            <button id="undo-btn" class="btn">Удалить последнюю</button>
+            <button id="export-btn" class="btn">Экспорт маршрута</button>
+        </div>
+    </div>
+
+    <!-- Передаем данные станций из Django в JS -->
+    <script>
+        const STATIONS_DATA = {{ stations_json|safe }};
+        const START_STATION = "{{ start_station }}";
+        const SUBMIT_RESULT_URL = "{% url 'submit_result' %}";
+    const THANK_YOU_URL = "{% url 'thank_you' %}";
+    const CSRF_TOKEN = "{{ csrf_token }}";
+    const APP_CONFIG = {
+        submitUrl: "{% url 'submit_result' %}",
+        thankYouUrl: "{% url 'thank_you' %}",
+        csrfToken: "{{ csrf_token }}",
+        stationsData: {{ stations_json|safe }},
+        startStation: "{{ start_station }}"
+    };
+    </script>
+
+    
+    <script src="{% static 'route_builder/js/app.js' %}"></script>
+</body>
+</html>

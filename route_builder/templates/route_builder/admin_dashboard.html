@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Панель администратора</title>
+    <link rel="stylesheet" href="{% static 'route_builder/css/style.css' %}">
+</head>
+<body>
+    <div class="admin-dashboard">
+        <h1>Панель администратора</h1>
+        
+        <h2>Участники</h2>
+        <table class="participants-table">
+            <thead>
+                <tr>
+                    <th>Логин</th>
+                    <th>Email</th>
+                    <th>Дата регистрации</th>
+                    <th>Количество попыток</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participant in participants %}
+                <tr>
+                    <td>{{ participant.username }}</td>
+                    <td>{{ participant.email }}</td>
+                    <td>{{ participant.date_joined }}</td>
+                    <td>{{ participant.results.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h2>Результаты</h2>
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Участник</th>
+                    <th>Время</th>
+                    <th>Расстояние</th>
+                    <th>Эталонное время</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.participant.username }}</td>
+                    <td>{{ result.total_time|floatformat:1 }} ч</td>
+                    <td>{{ result.total_distance }} км</td>
+                    <td>{{ result.reference_time|default:"-" }} ч</td>
+                    <td>
+                        {% if result.is_approved %}
+                            <span class="status-approved">Проверено</span>
+                        {% else %}
+                            <span class="status-pending">Требует проверки</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn view-details" data-id="{{ result.id }}">Детали</button>
+                        {% if not result.is_approved %}
+                            <button class="btn approve" data-id="{{ result.id }}">Подтвердить</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <a href="{% url 'index' %}" class="btn">На главную</a>
+        <a href="{% url 'logout' %}" class="btn">Выйти</a>
+    </div>
+    
+    <script>
+        // Логика для кнопок подтверждения и просмотра деталей
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const resultId = btn.dataset.id;
+                alert(`Просмотр деталей результата #${resultId}`);
+                // Здесь можно реализовать модальное окно с деталями
+            });
+        });
+        
+        document.querySelectorAll('.approve').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const resultId = btn.dataset.id;
+                fetch(`/admin/approve-result/${resultId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        btn.closest('tr').querySelector('.status-pending').className = 'status-approved';
+                        btn.closest('tr').querySelector('.status-pending').textContent = 'Проверено';
+                        btn.remove();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
