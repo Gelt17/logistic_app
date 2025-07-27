@@ -161,35 +161,48 @@ function submitResult() {
     const data = {
         route: route,
         total_time: totalTime,
-        total_distance: totalDistance
+        total_distance: totalDistance,
+        participant: window.APP_CONFIG.userId  // Добавляем ID пользователя
     };
     
-    console.log("Submitting to:", APP_CONFIG.submitUrl);
-    console.log("CSRF Token:", APP_CONFIG.csrfToken);
-    
-    fetch(APP_CONFIG.submitUrl, {
+    fetch(window.APP_CONFIG.submitUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': APP_CONFIG.csrfToken
+            'X-CSRFToken': getCookie('csrftoken')  // Используем функцию для получения CSRF
         },
+        credentials: 'include',  // Важно для куков
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('HTTP error ' + response.status);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
     })
     .then(data => {
         if (data.status === 'success') {
-            window.location.href = APP_CONFIG.thankYouUrl;
+            window.location.href = window.APP_CONFIG.thankYouUrl;
         } else {
-            alert('Ошибка отправки результата: ' + (data.message || 'Неизвестная ошибка'));
+            alert('Ошибка: ' + (data.message || 'Неизвестная ошибка'));
         }
     })
     .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Произошла ошибка при отправке результата: ' + error.message);
+        console.error('Ошибка отправки:', error);
+        alert('Ошибка отправки: ' + error.message);
     });
+}
+
+// Функция для получения CSRF-токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

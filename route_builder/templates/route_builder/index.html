@@ -51,19 +51,15 @@
 
     <!-- Передаем данные станций из Django в JS -->
     <script>
-        const STATIONS_DATA = {{ stations_json|safe }};
-        const START_STATION = "{{ start_station }}";
-        const SUBMIT_RESULT_URL = "{% url 'submit_result' %}";
-    const THANK_YOU_URL = "{% url 'thank_you' %}";
-    const CSRF_TOKEN = "{{ csrf_token }}";
-    const APP_CONFIG = {
+    window.APP_CONFIG = {
         submitUrl: "{% url 'submit_result' %}",
         thankYouUrl: "{% url 'thank_you' %}",
         csrfToken: "{{ csrf_token }}",
         stationsData: {{ stations_json|safe }},
-        startStation: "{{ start_station }}"
+        startStation: "{{ start_station }}",
+        userId: {{ request.user.id|default:0 }}  // Добавляем ID пользователя
     };
-    </script>
+</script>
 
     
     <script src="{% static 'route_builder/js/app.js' %}"></script>

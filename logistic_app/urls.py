@@ -2,9 +2,11 @@ from django.urls import path
 from route_builder import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('admin/', admin.site.urls),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('submit-result/', views.submit_result, name='submit_result'),
