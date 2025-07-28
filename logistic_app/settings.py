@@ -26,9 +26,9 @@ SECRET_KEY = 'django-insecure-4qs9eza_(q0an1x=nv1q(yx9ag(+@r&#(8=fsfi717k*&7t$mv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["logistic-app-fgqc.onrender.com"]
+# ALLOWED_HOSTS = ["logistic-app-fgqc.onrender.com"]
 
-
+ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
